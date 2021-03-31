@@ -14,10 +14,10 @@ function make_mines() {
         }
         flash_mine(m)
         mines.push(m)
-        console.log(m)
     }
 }
 
+// print(m)
 function calc_mine_count(): number {
     if (stage <= 3) {
         return 3

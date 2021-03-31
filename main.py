@@ -10,7 +10,7 @@ def make_mines():
                 continue
         flash_mine(m)
         mines.append(m)
-        print(m)
+        #print(m)
 
 def calc_mine_count():
     if stage <= 3:
