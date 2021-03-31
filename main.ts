@@ -21,7 +21,7 @@ function make_mines() {
 function calc_mine_count(): number {
     if (stage <= 3) {
         return 3
-    } else if (stage <= 6) {
+    } else if (stage <= 5) {
         return stage
     }
     
@@ -58,9 +58,26 @@ function judge_mine() {
 }
 
 input.onButtonPressed(Button.A, function on_button_pressed_a() {
-    music.playTone(330, music.beat(BeatFraction.Eighth))
-    eddie.turn(Direction.Right, 90)
-    show_direction()
+    
+    if (is_ready) {
+        music.playTone(330, music.beat(BeatFraction.Eighth))
+        eddie.turn(Direction.Right, 90)
+        show_direction()
+    }
+    
+})
+input.onButtonPressed(Button.B, function on_button_pressed_b() {
+    
+    if (is_ready) {
+        music.playTone(262, music.beat(BeatFraction.Eighth))
+        eddie.move(1)
+        judge_mine()
+        if (eddie.get(LedSpriteProperty.X) == 4 && eddie.get(LedSpriteProperty.Y) == 4) {
+            goal()
+        }
+        
+    }
+    
 })
 function show_bomb() {
     basic.showAnimation(`
@@ -73,23 +90,15 @@ function show_bomb() {
 }
 
 function goal() {
-    music.startMelody(music.builtInMelody(Melodies.PowerUp), MelodyOptions.Once)
     
+    is_ready = false
+    music.startMelody(music.builtInMelody(Melodies.PowerUp), MelodyOptions.Once)
     music.playTone(147, music.beat(BeatFraction.Eighth))
     stage += 1
     basic.pause(2000)
+    reset()
 }
 
-input.onButtonPressed(Button.B, function on_button_pressed_b() {
-    music.playTone(262, music.beat(BeatFraction.Eighth))
-    eddie.move(1)
-    judge_mine()
-    if (eddie.get(LedSpriteProperty.X) == 4 && eddie.get(LedSpriteProperty.Y) == 4) {
-        goal()
-        reset()
-    }
-    
-})
 function show_direction() {
     let arrow: number;
     let current_direction = eddie.direction()
@@ -113,13 +122,23 @@ function show_current_life() {
 function damage() {
     
     if (life > 0) {
+        is_ready = false
         music.startMelody(music.builtInMelody(Melodies.PowerDown), MelodyOptions.Once)
         show_bomb()
         life += -1
         show_current_life()
         basic.pause(2000)
         initialize_eddie()
+        play_game_music()
+    }
+    
+}
+
+function play_game_music() {
+    
+    if (life > 0) {
         music.startMelody(music.builtInMelody(Melodies.Nyan), MelodyOptions.Once)
+        is_ready = true
     }
     
 }
@@ -127,7 +146,7 @@ function damage() {
 function reset() {
     initialize_eddie()
     make_mines()
-    music.startMelody(music.builtInMelody(Melodies.Nyan), MelodyOptions.Once)
+    play_game_music()
 }
 
 function initialize_eddie() {
@@ -145,6 +164,7 @@ function clear_all() {
     eddie.on()
 }
 
+let is_ready = false
 let stage = 0
 let life = 3
 let eddie = game.createSprite(0, 0)

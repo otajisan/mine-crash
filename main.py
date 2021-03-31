@@ -41,10 +41,22 @@ def judge_mine():
             damage()
 
 def on_button_pressed_a():
-    music.play_tone(330, music.beat(BeatFraction.EIGHTH))
-    eddie.turn(Direction.RIGHT, 90)
-    show_direction()
+    global is_ready
+    if is_ready:
+        music.play_tone(330, music.beat(BeatFraction.EIGHTH))
+        eddie.turn(Direction.RIGHT, 90)
+        show_direction()
 input.on_button_pressed(Button.A, on_button_pressed_a)
+
+def on_button_pressed_b():
+    global is_ready
+    if is_ready:
+        music.play_tone(262, music.beat(BeatFraction.EIGHTH))
+        eddie.move(1)
+        judge_mine()
+        if eddie.get(LedSpriteProperty.X) == 4 and eddie.get(LedSpriteProperty.Y) == 4:
+            goal()
+input.on_button_pressed(Button.B, on_button_pressed_b)
 
 def show_bomb():
     basic.show_animation("""
@@ -56,20 +68,13 @@ def show_bomb():
     """)
 
 def goal():
+    global is_ready, stage
+    is_ready = False
     music.start_melody(music.built_in_melody(Melodies.POWER_UP), MelodyOptions.ONCE)
-    global stage
     music.play_tone(147, music.beat(BeatFraction.EIGHTH))
     stage += 1
     basic.pause(2000)
-
-def on_button_pressed_b():
-    music.play_tone(262, music.beat(BeatFraction.EIGHTH))
-    eddie.move(1)
-    judge_mine()
-    if eddie.get(LedSpriteProperty.X) == 4 and eddie.get(LedSpriteProperty.Y) == 4:
-        goal()
-        reset()
-input.on_button_pressed(Button.B, on_button_pressed_b)
+    reset()
 
 def show_direction():
     current_direction = eddie.direction()
@@ -87,27 +92,34 @@ def show_current_life():
     basic.show_string("" + str(life))
 
 def damage():
-    global life
+    global is_ready, life
     if life > 0:
+        is_ready = False
         music.start_melody(music.built_in_melody(Melodies.POWER_DOWN), MelodyOptions.ONCE)
         show_bomb()
         life += -1
         show_current_life()
         basic.pause(2000)
         initialize_eddie()
+        play_game_music()
+
+def play_game_music():
+    global is_ready
+    if life > 0:
         music.start_melody(music.built_in_melody(Melodies.NYAN), MelodyOptions.ONCE)
+        is_ready = True
 
 def reset():
     initialize_eddie()
     make_mines()
-    music.start_melody(music.built_in_melody(Melodies.NYAN), MelodyOptions.ONCE)
+    play_game_music()
 
 def initialize_eddie():
     eddie.set_direction(90)
     eddie.set(LedSpriteProperty.X, 0)
     eddie.set(LedSpriteProperty.Y, 0)
 
-def clear_all():    
+def clear_all():
     global stage, life, mines
     mines = []
     stage = 0
@@ -115,6 +127,7 @@ def clear_all():
     reset()
     eddie.on()
 
+is_ready = False
 stage = 0
 life = 3
 eddie: game.LedSprite = game.create_sprite(0, 0)
