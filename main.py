@@ -8,7 +8,6 @@ def make_mines():
         for n in mines:
             if n[0] == m[0] and n[1] == m[1]:
                 continue
-        #print(m)
         flash_mine(m)
         mines.append(m)
 def make_random_mine():
@@ -38,10 +37,14 @@ def initialize_eddie():
     eddie.set(LedSpriteProperty.Y, 0)
 
 def on_button_pressed_a():
+    global is_ready
     if is_ready:
+        is_ready = False
         music.play_tone(330, music.beat(BeatFraction.EIGHTH))
         eddie.turn(Direction.RIGHT, 90)
         show_direction()
+        basic.pause(100)
+        is_ready = True
 input.on_button_pressed(Button.A, on_button_pressed_a)
 
 def show_bomb():
@@ -78,10 +81,14 @@ def show_direction():
     basic.show_arrow(arrow)
 
 def on_button_pressed_b():
+    global is_ready
     if is_ready:
+        is_ready = False
         music.play_tone(262, music.beat(BeatFraction.EIGHTH))
         eddie.move(1)
         judge_mine()
+        basic.pause(100)
+        is_ready = True
         if eddie.get(LedSpriteProperty.X) == 4 and eddie.get(LedSpriteProperty.Y) == 4:
             goal()
 input.on_button_pressed(Button.B, on_button_pressed_b)

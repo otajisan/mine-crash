@@ -12,7 +12,6 @@ function make_mines() {
             }
             
         }
-        // print(m)
         flash_mine(m)
         mines.push(m)
     }
@@ -56,10 +55,14 @@ function initialize_eddie() {
 }
 
 input.onButtonPressed(Button.A, function on_button_pressed_a() {
+    
     if (is_ready) {
+        is_ready = false
         music.playTone(330, music.beat(BeatFraction.Eighth))
         eddie.turn(Direction.Right, 90)
         show_direction()
+        basic.pause(100)
+        is_ready = true
     }
     
 })
@@ -109,10 +112,14 @@ function show_direction() {
 }
 
 input.onButtonPressed(Button.B, function on_button_pressed_b() {
+    
     if (is_ready) {
+        is_ready = false
         music.playTone(262, music.beat(BeatFraction.Eighth))
         eddie.move(1)
         judge_mine()
+        basic.pause(100)
+        is_ready = true
         if (eddie.get(LedSpriteProperty.X) == 4 && eddie.get(LedSpriteProperty.Y) == 4) {
             goal()
         }
